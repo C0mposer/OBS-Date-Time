@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>OBS Date & Time Display</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900&family=Orbitron:wght@400;500;600;700;800;900&family=Oswald:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Roboto+Mono:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="editorApp" class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">⏱</div>
+        <div class="brand-copy">
+          <h1>OBS Date & Time Display</h1>
+          <p>Configure a Date & Time browser source for OBS</p>
+        </div>
+      </div>
+      <button class="btn ghost small" id="resetBtn" type="button">Reset</button>
+    </header>
+
+    <div class="layout">
+      <section class="preview-card">
+        <div class="preview-head">
+          <span>Live preview</span>
+          <span id="previewSizeLabel">OBS-style transparent canvas</span>
+        </div>
+        <div class="preview-stage" id="previewStage">
+          <div class="clock" id="previewClock" aria-live="polite"></div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn primary" id="copyBtn" type="button">Copy Browser Source Link</button>
+          <button class="btn" id="openBtn" type="button">Open Overlay</button>
+        </div>
+      </section>
+
+      <aside class="controls">
+        <details class="panel" open>
+          <summary>Content</summary>
+          <div class="panel-body">
+            <div class="row" id="layoutRow">
+              <label class="field">Layout
+                <select data-key="layout">
+                  <option value="date-time">Date + time</option>
+                  <option value="time-date">Time + date</option>
+                  <option value="time">Time only</option>
+                  <option value="date">Date only</option>
+                  <option value="custom">Custom template</option>
+                </select>
+              </label>
+              <label class="field">Line arrangement
+                <select data-key="arrangement">
+                  <option value="stacked">Stacked</option>
+                  <option value="inline">Inline</option>
+                </select>
+              </label>
+              <label class="field" id="separatorField">Inline separator
+                <input type="text" maxlength="12" data-key="separator" />
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Time format
+                <select data-key="hour12">
+                  <option value="1">12-hour</option>
+                  <option value="0">24-hour</option>
+                </select>
+              </label>
+              <label class="field">Date format
+                <select data-key="dateFormat">
+                  <option value="numeric">09/11/2026</option>
+                  <option value="short">Sep 11, 2026</option>
+                  <option value="long">September 11, 2026</option>
+                  <option value="iso">2026-09-11</option>
+                  <option value="weekday">Friday, September 11</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="toggle-line">Show seconds <input type="checkbox" data-key="seconds"></label>
+              <label class="toggle-line">Show AM/PM <input type="checkbox" data-key="ampm"></label>
+            </div>
+
+            <div class="row single">
+              <label class="field">Timezone
+                <input type="text" placeholder="Local, or America/Los_Angeles" data-key="timezone" />
+              </label>
+            </div>
+
+            <div class="row single" id="templateRow">
+              <label class="field">Custom template
+                <textarea data-key="template" spellcheck="false"></textarea>
+              </label>
+              <p class="helper">Template tokens: <strong>{time}</strong>, <strong>{date}</strong>, <strong>{weekday}</strong>, <strong>{month}</strong>, <strong>{day}</strong>, <strong>{year}</strong>.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Typography</summary>
+          <div class="panel-body">
+            <div class="row">
+              <label class="field">Font
+                <select data-key="font">
+                  <optgroup label="Web fonts">
+                    <option value="Inter, ui-sans-serif, system-ui, sans-serif">Inter</option>
+                    <option value="Roboto, Arial, sans-serif">Roboto</option>
+                    <option value="'Source Sans 3', Arial, sans-serif">Source Sans 3</option>
+                    <option value="Montserrat, Arial, sans-serif">Montserrat</option>
+                    <option value="Poppins, Arial, sans-serif">Poppins</option>
+                    <option value="Lato, Arial, sans-serif">Lato</option>
+                    <option value="'Nunito Sans', Arial, sans-serif">Nunito Sans</option>
+                    <option value="Raleway, Arial, sans-serif">Raleway</option>
+                    <option value="Oswald, Arial, sans-serif">Oswald</option>
+                    <option value="'Barlow Condensed', Arial, sans-serif">Barlow Condensed</option>
+                    <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+                    <option value="Orbitron, Arial, sans-serif">Orbitron</option>
+                    <option value="'Roboto Mono', monospace">Roboto Mono</option>
+                    <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
+                  </optgroup>
+                  <optgroup label="Common system fonts">
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+                    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Impact, 'Arial Black', sans-serif">Impact</option>
+                    <option value="'Arial Black', Impact, sans-serif">Arial Black</option>
+                  </optgroup>
+                </select>
+              </label>
+              <div class="system-font-control">
+                <span class="field-label">Installed font</span>
+                <div class="system-font-buttons">
+                  <button class="btn small" id="browseFontsBtn" type="button">Browse installed fonts…</button>
+                  <button class="btn small ghost" id="clearSystemFontBtn" type="button" hidden>Clear</button>
+                </div>
+                <span class="selected-font" id="selectedSystemFont">None selected</span>
+              </div>
+            </div>
+
+            <div class="system-font-browser" id="systemFontBrowser" hidden>
+              <input id="systemFontSearch" type="text" placeholder="Filter installed fonts…" autocomplete="off" />
+              <select id="systemFontSelect" size="7" aria-label="Installed fonts"></select>
+              <div class="helper" id="systemFontStatus"></div>
+            </div>
+
+            <div class="row">
+              <label class="field">Font size
+                <div class="inline-control">
+                  <input type="range" min="12" max="240" step="1" data-key="fontSize" />
+                  <input type="number" min="12" max="240" step="1" data-key="fontSize" />
+                </div>
+              </label>
+              <label class="field">Weight
+                <select data-key="fontWeight">
+                  <option value="300">Light</option>
+                  <option value="400">Regular</option>
+                  <option value="500">Medium</option>
+                  <option value="600">Semi-bold</option>
+                  <option value="700">Bold</option>
+                  <option value="800">Extra-bold</option>
+                  <option value="900">Black</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Text color
+                <input type="color" data-key="textColor" />
+              </label>
+              <label class="field">Alignment
+                <select data-key="align">
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Letter spacing
+                <div class="inline-control">
+                  <input type="range" min="-5" max="20" step=".5" data-key="letterSpacing" />
+                  <input type="number" min="-5" max="20" step=".5" data-key="letterSpacing" />
+                </div>
+              </label>
+              <label class="field">Line spacing
+                <div class="inline-control">
+                  <input type="range" min=".7" max="2" step=".05" data-key="lineHeight" />
+                  <input type="number" min=".7" max="2" step=".05" data-key="lineHeight" />
+                </div>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary>Background & Border</summary>
+          <div class="panel-body">
+            <div class="row">
+              <label class="field">Background
+                <input type="color" data-key="bgColor" />
+              </label>
+              <label class="field">Background opacity
+                <div class="inline-control">
+                  <input type="range" min="0" max="100" step="1" data-key="bgOpacity" />
+                  <input type="number" min="0" max="100" step="1" data-key="bgOpacity" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Padding X
+                <div class="inline-control">
+                  <input type="range" min="0" max="120" step="1" data-key="paddingX" />
+                  <input type="number" min="0" max="120" step="1" data-key="paddingX" />
+                </div>
+              </label>
+              <label class="field">Padding Y
+                <div class="inline-control">
+                  <input type="range" min="0" max="120" step="1" data-key="paddingY" />
+                  <input type="number" min="0" max="120" step="1" data-key="paddingY" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Border color
+                <input type="color" data-key="borderColor" />
+              </label>
+              <label class="field">Border width
+                <div class="inline-control">
+                  <input type="range" min="0" max="30" step="1" data-key="borderWidth" />
+                  <input type="number" min="0" max="30" step="1" data-key="borderWidth" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Corner radius
+                <div class="inline-control">
+                  <input type="range" min="0" max="100" step="1" data-key="radius" />
+                  <input type="number" min="0" max="100" step="1" data-key="radius" />
+                </div>
+              </label>
+              <label class="field">Overall opacity
+                <div class="inline-control">
+                  <input type="range" min="0" max="100" step="1" data-key="opacity" />
+                  <input type="number" min="0" max="100" step="1" data-key="opacity" />
+                </div>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary>Stroke & Shadow</summary>
+          <div class="panel-body">
+            <div class="row">
+              <label class="field">Stroke color
+                <input type="color" data-key="strokeColor" />
+              </label>
+              <label class="field">Stroke width
+                <div class="inline-control">
+                  <input type="range" min="0" max="12" step=".5" data-key="strokeWidth" />
+                  <input type="number" min="0" max="12" step=".5" data-key="strokeWidth" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label class="field">Shadow color
+                <input type="color" data-key="shadowColor" />
+              </label>
+              <label class="field">Shadow opacity
+                <div class="inline-control">
+                  <input type="range" min="0" max="100" step="1" data-key="shadowOpacity" />
+                  <input type="number" min="0" max="100" step="1" data-key="shadowOpacity" />
+                </div>
+              </label>
+            </div>
+
+            <div class="row three">
+              <label class="field">X
+                <input type="number" min="-100" max="100" step="1" data-key="shadowX" />
+              </label>
+              <label class="field">Y
+                <input type="number" min="-100" max="100" step="1" data-key="shadowY" />
+              </label>
+              <label class="field">Blur
+                <input type="number" min="0" max="100" step="1" data-key="shadowBlur" />
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary>Presets</summary>
+          <div class="panel-body">
+            <div class="preset-grid">
+              <button class="preset" type="button" data-preset="clean">Clean</button>
+              <button class="preset" type="button" data-preset="boxed">Boxed</button>
+              <button class="preset" type="button" data-preset="retro">Retro</button>
+              <button class="preset" type="button" data-preset="minimal">Minimal</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Browser Source</summary>
+          <div class="panel-body">
+            <div class="row">
+              <label class="field">Recommended width
+                <input type="number" min="100" max="3840" step="1" data-key="canvasWidth" />
+              </label>
+              <label class="field">Recommended height
+                <input type="number" min="50" max="2160" step="1" data-key="canvasHeight" />
+              </label>
+            </div>
+            <div class="url-box"><code id="urlPreview"></code></div>
+            <p class="helper">Paste this URL into an OBS Browser Source. The overlay itself is transparent; the checkerboard is preview-only.</p>
+            <div class="status" id="status"></div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </main>
+
+  <main id="overlayApp" class="overlay-root" hidden>
+    <div class="clock" id="overlayClock"></div>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
