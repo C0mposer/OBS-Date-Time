@@ -1,14 +1,13 @@
-:root {
+    :root {
       font-family: Arial, Helvetica, sans-serif;
       color: #e8e8e8;
-      background: #111;
       --accent: #5b9cff;
       --accent-hover: #72aaff;
       --accent-soft: #1c2a3e;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    html, body { margin: 0; min-height: 100%; background: transparent; }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
     [hidden] { display: none !important; }

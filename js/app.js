@@ -366,6 +366,7 @@
       }
 
       if (isOverlay) {
+        document.documentElement.style.background = "transparent";
         document.body.style.background = "transparent";
         editorApp.hidden = true;
         overlayApp.hidden = false;
